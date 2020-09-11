@@ -11,6 +11,7 @@ library(shiny)
 library(rentrez)
 library(taxize)
 
+
 shinyServer(function(input, output) {
     
     coverage <- reactive({
@@ -23,16 +24,26 @@ shinyServer(function(input, output) {
             need(organismListLength > 0, 'Please name at least one organism'),
             need(codeListLength > 0, 'Please choose at least one barcode')
         )
-        searchTerm <- ""
-        searchResult <- 0
-        results <- c()
+        searchTerm <- "" #pasted into GenBank
+        searchResult <- 0 #number of sequences returned from most recent search results
+        results <- c() #Vector/list of the most recent search results
         for(organism in organismList){
             for(code in barcodeList()){
                 searchTerm <- paste(organism, "[ORGN] AND ", code, "[GENE]", sep="")
                 searchResult <- entrez_search(db = "nucleotide", term = searchTerm, retmax = 0)$count
-                results <- c(results, searchResult)
+                #If nothing found, look for any hits for the species
+                if(searchResult == 0 & input$ifNothingFound){
+                    searchTerm <- paste(organism, "[ORGN]", sep = "")
+                    searchResult <- entrez_search(db = "nucleotide", term = searchTerm, retmax = 0)$count
+                    searchResult<- searchResult * (-1)
+                }
+                results <- c(results, searchResult) #appending new value to the end
+        
+                    
+                
             }
         }
+        
         data <- matrix(results, nrow = organismListLength, ncol = codeListLength, byrow = TRUE)
         data
     })
@@ -88,6 +99,7 @@ shinyServer(function(input, output) {
         # taxize_org_list()[[3]]
         
     )
+ 
     
     
 })

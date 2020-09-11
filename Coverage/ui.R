@@ -28,6 +28,7 @@ shinyUI(fluidPage(
           textAreaInput(inputId = "organismList", label = "Species Names"),
           textAreaInput(inputId = "barcodeList", label = "Barcodes of Interest"),
           checkboxInput(inputId = "taxizeOption", label = "Include taxonomic resolution", value = TRUE),
+          checkboxInput(inputId = "ifNothingFound", label = "If no genes found, search for only the species name", value = TRUE),
           actionButton(inputId = "searchButton", label = "Search")
       )
     ),
